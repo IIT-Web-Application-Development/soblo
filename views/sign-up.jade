@@ -1,0 +1,57 @@
+doctype html
+html(lang="en")
+	head
+		include fragments/common/head
+	body
+
+		// Alert Modal
+		div#alertModal.alert.modal.fade(role="dialog")
+			div.modal-dialog
+				div.modal-content
+					div.modal-header
+						button(type="button", data-dismiss="modal").close &times;
+						h4.modal-title
+					div.modal-body
+
+		// Top navigation bar
+		include fragments/common/nav
+
+		div.container
+			div.content
+				form(name="signup", action="/sign-up", method="POST", autocomplete="off")#signupForm
+					h4 Sign Up
+
+					div.input-group
+						label(for="userName") Choose a user name:
+						div#userNameError.error
+						input(type="text", name="userName", placeholder="jschmo", minlength="2", maxlength="10", required).form-control
+
+					div.input-group
+						label(for="email") Email:
+						div#emailError.error
+						input(type="email", name="email", placeholder="jschmo@example.com", minlength="6", required).form-control
+
+					div.input-group
+						label(for="firstName") First Name:
+						div#firstNameError.error
+						input(type="text", name="firstName", placeholder="Joe", minlength="2", required).form-control
+
+					div.input-group
+						label(for="lastName") Last Name:
+						div#lastNameError.error
+						input(type="text", name="lastName", placeholder="Schmo", minlength="2", required).form-control
+
+					div.input-group
+						label(for="password") Enter a Password:
+						div#passwordError.error
+						input(type="password", name="password", minlength="6", maxlength="12", required).form-control
+
+					div.input-group
+						label(for="confirmPassword") Confirm Password:
+						div#confirmPasswordError.error
+						input(type="password", name="confirmPassword", minlength="6", maxlength="12", required).form-control
+
+					br
+
+					div.input-group-btn
+						button(type="submit", disabled).btn.btn-primary Sign Up

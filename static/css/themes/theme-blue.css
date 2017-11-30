@@ -1,0 +1,7 @@
+body.theme-blue {
+    background:lightcyan;
+}
+
+body.theme-blue .navbar.navbar-default {
+    background: linear-gradient(to top,aliceblue,lightblue);
+}

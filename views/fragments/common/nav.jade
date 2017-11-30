@@ -1,0 +1,48 @@
+nav.navbar.navbar-default
+	div.container
+		div.navbar-header
+			a(href="/", title="Homepage").navbar-brand ITMD 562 - Final
+		//div#navbar.collapse.navbar-collapse
+		ul(data-toggle="collapse" data-target=".nav-collapse").nav.navbar-nav
+		ul.nav.navbar-nav.navbar-right
+			- if (user != undefined && user.isAuth)
+				li
+					a(href="#", data-toggle="dropdown").dropdown-toggle
+						span Welcome, #{user.firstName} #{user.lastName}
+						span.caret
+					ul.dropdown-menu
+						li.dropdown-submenu
+							a(href="#").nestedDropdown
+								span Preferences
+								span.caret
+							ul.dropdown-menu
+								li
+									a(href="#", data-toggle="modal", data-target="#colorSchemesModal") Color Schemes
+				li
+					a(href="/logout", title="Logout") Logout
+			- else
+				li
+					a(href="/sign-up", title="Sign Up") Sign Up
+				li
+					a(href="/", title="Login") Login
+
+- if (user !== undefined && user.isAuth)
+	// Color Schemes Modal
+	div#colorSchemesModal.modal.fade(role="dialog")
+		div.modal-dialog
+			div.modal-content
+				div.modal-header
+					button(type="button", data-dismiss="modal").close &times;
+					h4.modal-title Choose a Color Theme
+				div.modal-body
+					form(name="updateTheme", action="/update-theme", method="POST")
+						for colorScheme in colorSchemes.schemes
+							label(for="#{colorScheme}") #{colorSchemes.getName(colorScheme)}&nbsp;
+
+							- if (user.preferences.colorScheme == colorScheme)
+								input(id="#{colorScheme}", type="radio", name="colorScheme", value="#{colorScheme}", checked)
+							- else
+								input(id="#{colorScheme}", type="radio", name="colorScheme", value="#{colorScheme}")
+							br
+						br
+						button.btn.btn-primary Update Theme

@@ -1,0 +1,17 @@
+form(name="login", action="/login", method="POST")
+	h4 Login
+
+	div.input-group.small-width
+		label(for="userName") User Name:
+		input(type="text", name="userName", value="#{user.userName}", placeholder="jschmo", minlength="2", maxlength="10", required).form-control
+
+	div.input-group.small-width
+		label(for="password") Password:
+		input(type="password", name="password", placeholder="Password", minlength="6", maxlength="12", required).form-control
+
+	br
+
+	div.input-group-btn
+
+		button(type="submit").btn.btn-primary Login
+	a(href="/sign-up", title="Sign Up") No Account? Sign up!

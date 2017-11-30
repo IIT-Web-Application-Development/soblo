@@ -1,0 +1,48 @@
+body {
+	height:100%;
+	background:#EFEFEF;
+}
+form[name='login'],
+form[name='signup'] {
+    width:400px;
+    margin:auto;
+    padding:25px;
+    background: lightsteelblue;
+    border-radius:4px;
+}
+.dropdown-submenu {
+    position: relative;
+}
+.dropdown-submenu .dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: -1px;
+}
+.content {
+    padding: 15px;
+    border-radius: 4px;
+}
+.navbar button {
+	margin-top:7px;
+}
+.table-responsive {
+    background: ivory;
+    padding: 5px 20px;
+    border-radius:4px;
+}
+form[name='signup'] .input-group {
+    width:100%;
+}
+label,
+input[type='radio'] {
+    vertical-align: top;
+}
+label[for] {
+    cursor:pointer;
+}
+.input-group.small-width {
+    width:200px;
+}
+.error {
+    color:red;
+}

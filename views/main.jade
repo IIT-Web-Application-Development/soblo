@@ -1,0 +1,23 @@
+doctype html
+html(lang="en")
+	head
+		include fragments/common/head
+	body(class="#{user.preferences.colorScheme}")
+		// Alert Modal
+		div#alertModal.alert.modal.fade(role="dialog")
+			div.modal-dialog
+				div.modal-content
+					div.modal-header
+						button(type="button", data-dismiss="modal").close &times;
+						h4.modal-title
+					div.modal-body
+
+		// Top navigation bar
+		include fragments/common/nav
+
+		div.container
+			div.content
+				- if (!user.isAuth)
+					include fragments/login
+				- else
+					p Logged In!

@@ -17,15 +17,6 @@ var passwordHash = require('password-hash');
 /*var nodemailer = require('nodemailer');
 var smtpTransport = require('nodemailer-smtp-transport');
 
-var transporter = nodemailer.createTransport(smtpTransport({
-    service: 'gmail',
-  	host: 'smtp.gmail.com',
-    auth: {
-        user: "drakaric@gmail.com",
-        pass: "SRVaughan1"
-    }
-}));*/
-
 // Local
 var functions = require('./server/functions');
 //var User = functions.User;

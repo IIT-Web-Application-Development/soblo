@@ -16,11 +16,13 @@ var request = require('request');
 var passwordHash = require('password-hash');
 /*var nodemailer = require('nodemailer');
 var smtpTransport = require('nodemailer-smtp-transport');
-
+*/
 // Local
 var functions = require('./server/functions');
+var notifications = require('./server/notifications');
 //var User = functions.User;
 var Users = functions.Users;
+var Notifications = notifications.Notifications;
 //var Preferences = functions.Preferences;
 var pw = functions.password(passwordHash);
 
@@ -60,24 +62,46 @@ app.listen(app.get("port"), function() {
 	dummyUser.firstName = "Daniel";
 	dummyUser.lastName = "Rakaric";
 	dummyUser.preferences = {colorScheme:"theme-blue"};
+	dummyUser.followers = [];
 	dummyUser.password = pw.generateDefault();
 
 	Users.addUser(dummyUser);
 
-	/*var mailOptions = {
-		from: "drakaric@banner.iit.edu",
-		to: "drakaric@banner.iit.edu",
-		subject: "Sending Email using Node.js",
-		text: "That was easy!"
-	};
+	var dummyUser1 = functions.User();
 
-	transporter.sendMail(mailOptions, function(error, info) {
-		if (error) {
-			console.log(error);
-		} else {
-			console.log('Email sent: ' + info.response);
-		}
-	});*/
+	dummyUser1.userName = "oruiz";
+	dummyUser1.email = "oruiz@gmail.com";
+	dummyUser1.firstName = "Oscar";
+	dummyUser1.lastName = "Ruiz";
+	dummyUser1.preferences = {colorScheme:"theme-blue"};
+	dummyUser1.followers = [];
+	dummyUser1.password = pw.generateDefault();
+
+	Users.addUser(dummyUser1);
+
+	var dummyUser2 = functions.User();
+
+	dummyUser2.userName = "sbalarajan";
+	dummyUser2.email = "surya@gmail.com";
+	dummyUser2.firstName = "Suryadevi";
+	dummyUser2.lastName = "Balarajan";
+	dummyUser2.preferences = {colorScheme:"theme-blue"};
+	dummyUser2.followers = [];
+	dummyUser2.password = pw.generateDefault();
+
+	Users.addUser(dummyUser2);
+
+	var dummyUser3 = functions.User();
+
+	dummyUser3.userName = "jdoe";
+	dummyUser3.email = "jdoe@gmail.com";
+	dummyUser3.firstName = "John";
+	dummyUser3.lastName = "Doe";
+	dummyUser3.preferences = {colorScheme:"theme-blue"};
+	dummyUser3.followers = [];
+	dummyUser3.password = pw.generateDefault();
+
+	Users.addUser(dummyUser3);
 });
 
 
@@ -117,6 +141,79 @@ app.get("/users/:userName", function(request, response) {
 	if (searchedUser !== undefined) response.status(200).send({"user":searchedUser});
 	else response.status(200).send({"error":"User not found"});
 	
+});
+
+app.get("/or", function(request, response) {
+	var sess = request.session;
+	var user = sess.user;
+
+	if (sess.user === undefined) user = functions.User();
+	else user = sess.user;
+
+	response.render("or-all-users", {user, userList: Users.users, "colorSchemes": functions.ColorSchemes, notificationList : Notifications.notifications});
+	
+});
+
+app.get("/or/:userName/notifications", function(request, response){
+	//Set content type header
+	response.set('Content-Type', 'application/json');
+	var sess = request.session;
+	var user = sess.user;
+
+	if (sess.user === undefined) user = functions.User();
+	else user = sess.user;
+
+	var currentUserId = user.id;
+	var userName = request.params.userName;
+	var storedUser = Users.findByUserName(userName);
+	var myNotifications = [];
+
+	//Check for valid user to follow
+	if(storedUser != undefined){
+		var allNotifications = Notifications.notifications;
+		for(var i = 0; i < allNotifications.length; i++){
+			var thisNotification = allNotifications[i];
+
+			if(Notifications.isFollowerAllowed(thisNotification.id, storedUser.id)){
+				myNotifications.push(Notifications.findByNotificationID(thisNotification.id, storedUser.id));
+			}
+		}
+		response.status(200).send({ notificationList : myNotifications });
+	}
+	else{
+		response.status(404).send({"error" : 404, "title" : "Error", "message" : "No user found" });
+	}
+});
+
+app.get("/or/:userName/notifications/:notificationId", function(request, response){
+	//Set content type header
+	response.set('Content-Type', 'application/json');
+	var sess = request.session;
+	var user = sess.user;
+
+	if (sess.user === undefined) user = functions.User();
+	else user = sess.user;
+
+	var currentUserId = user.id;
+	var userName = request.params.userName;
+	var notificationID = request.params.notificationId;
+	var storedUser = Users.findByUserName(userName);
+	var myNotification = {};
+
+	//Check for valid user to follow
+	if(storedUser != undefined){
+		if(Notifications.isFollowerAllowed(notificationID, storedUser.id)){
+			myNotification = Notifications.findByNotificationID(notificationID, storedUser.id);
+			//Notifications.isFollowerRemovedByID(notificationID, storedUser.id);
+			response.status(200).send({ notificationList : myNotification });
+		}
+		else{
+			response.status(400).send({"error" : 400, "title" : "Error", "message" : "User not allowed to view this notification." });
+		}
+	}
+	else{
+		response.status(404).send({"error" : 404, "title" : "Error", "message" : "No user found" });
+	}
 });
 
 /*** GET METHODS END ***/
@@ -170,6 +267,64 @@ app.post("/update-theme", function(request, response) {
 	response.redirect("/");
 });
 
+app.post("/or/:userName/follow", function(request, response){
+	//Set content type header
+	response.set('Content-Type', 'application/json');
+	var sess = request.session;
+	var user = sess.user;
+
+	if (sess.user === undefined) user = functions.User();
+	else user = sess.user;
+
+	var currentUserId = user.id;
+	var userName = request.params.userName;
+	var storedUser = Users.findByUserName(userName);
+
+	//Check for valid user to follow
+	if(storedUser == undefined){
+		response.status(404).send({"error" : 404, "title" : "Error", "message" : "No user found"});
+	}
+	//Check if follower doesn't exist and that the logged in user can't follow themselves
+	else if(userName != user.userName && !Users.verifyFollower(storedUser, currentUserId)){
+		storedUser.followers.push(currentUserId);
+
+		response.status(200).send({ "error" : 0, "title" : "Success", "message" : "Successfully subscribed to user." });
+	}
+	else{
+		response.status(200).send({"error" : 0, "title" : "Warning", "message" : "Already following user." });
+	}
+});
+
+//NOTE: CHANGE TO POST
+app.post("/or/:userName/notifications", function(request, response){
+	//Set content type header
+	response.set('Content-Type', 'application/json');
+	//var sess = request.session;
+	//var currentUserId = sess.user.id;
+	var userName = request.params.userName;
+	var storedUser = Users.findByUserName(userName);
+	var allowedFollowers = [];
+
+	//Check for valid user to follow
+	if(storedUser != undefined){
+
+		for(var i = 0; i < storedUser.followers.length; i++){
+			allowedFollowers.push(storedUser.followers[i]);
+		}
+
+		var newNotification = notifications.Notification();
+
+		newNotification.ownerId = storedUser.id;
+		newNotification.blogTitle = "Test1";
+		newNotification.userName = userName;
+		newNotification.followersAllowed = allowedFollowers;
+		Notifications.addNotification(newNotification);
+		response.status(200).send({ "error" : 0, "title" : "Success", "message" : "Successfully added notification.", notificationList : Notifications.notifications  });
+	}
+	else{
+		response.status(404).send({"error" : 404, "title" : "Error", "message" : "No user found" });
+	}
+});
 /*** POST METHODS END ***/
 
 
@@ -179,3 +334,76 @@ app.delete("/users/:userId", function(request, response) {
 });
 
 /*** DELETE METHODS END ***/
+
+
+/*** PUT METHODS START ***/
+
+app.put("/or/:userName/follow", function(request, response){
+	//Set content type header
+	response.set('Content-Type', 'application/json');
+	var sess = request.session;
+	var user = sess.user;
+
+	if (sess.user === undefined) user = functions.User();
+	else user = sess.user;
+
+	var currentUserId = user.id;
+	var userName = request.params.userName;
+	var storedUser = Users.findByUserName(userName);
+
+	//Check for valid user to follow
+	if(storedUser == undefined){
+		response.status(404).send({"error" : 404, "title" : "Error", "message" : "No user found"});
+	}
+	//Check if follower exists
+	else if(Users.verifyFollower(storedUser, currentUserId)){
+		//Loop through the list of followers to
+		//remove the proper element based on the index
+		for(var i = 0; i < storedUser.followers.length; i++){
+			//Index value
+			var followerId = storedUser.followers[i];
+			if(followerId == currentUserId){
+				//Remove Reminder object from the list based on the index provided
+				storedUser.followers.splice(i, 1);
+			}
+		}
+
+		response.status(200).send({ "error" : 0, "title" : "Success", "message" : "Successfully unsubscribed to user." });
+	}
+	else{
+		response.status(200).send({"error" : 0, "title" : "Warning", "message" : "Already unsubscribed to user." });
+	}
+});
+
+app.put("/or/:userName/notifications/:notificationId", function(request, response){
+	//Set content type header
+	response.set('Content-Type', 'application/json');
+	var sess = request.session;
+	var user = sess.user;
+
+	if (sess.user === undefined) user = functions.User();
+	else user = sess.user;
+
+	var currentUserId = user.id;
+	var userName = request.params.userName;
+	var notificationID = request.params.notificationId;
+	var storedUser = Users.findByUserName(userName);
+	var myNotification = {};
+
+	//Check for valid user to follow
+	if(storedUser != undefined){
+		if(Notifications.isFollowerAllowed(notificationID, storedUser.id)){
+			myNotification = Notifications.findByNotificationID(notificationID, storedUser.id);
+			Notifications.isFollowerRemovedByID(notificationID, storedUser.id);
+			response.status(200).send({ "error" : 0, "title" : "Success", "message" : "Successfully read the notification." });
+			//response.status(200).send({ notificationList : myNotification });
+		}
+		else{
+			response.status(400).send({"error" : 400, "title" : "Error", "message" : "User not allowed to view this notification." });
+		}
+	}
+	else{
+		response.status(404).send({"error" : 404, "title" : "Error", "message" : "No user found" });
+	}
+});
+/*** PUT METHODS END ***/

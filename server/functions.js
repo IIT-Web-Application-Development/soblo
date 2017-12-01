@@ -31,6 +31,23 @@ var Users = {
 			}
 		}
 	},
+	verifyFollower: function(user, followerId) {
+		console.log("Searching for follower ID: " + followerId);
+		var isFound = false;
+
+		for (var i = 0; i < user.followers.length; i++) {
+			var thisFollower = user.followers[i];
+
+			console.log("Compare value: " + thisFollower);
+			if (thisFollower == followerId) {
+				console.log("Follower with ID: " + thisFollower + " already exists.");
+				isFound = true;
+			}
+		}
+
+		console.log("Is follower found? " + isFound);
+		return isFound;
+	},
 	nextUserId: function() {
 		var nextUserId = 0; // Start at 0; it will always return 1 or greater.
 
@@ -73,6 +90,7 @@ function User() {
 	this.lastName = "";
 	this.isAuth = false;
 	this.preferences = {};
+	this.followers = [];
 	this.uniqueConstraint = function() {
 		return this.userName;
 	}

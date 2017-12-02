@@ -3,11 +3,12 @@ $(document).on("click", "#notification-link", function(event){
 		//Stop form from submitting normally
         event.preventDefault();
         var userName = $(this).attr('data-notification-user-name');
+        var blogTitle = $(this).attr('data-notification-title');
 
 		$.ajax({
 			method: "POST",
 			url: mainServerPath + userName + "/notifications",
-			data: {"trigger": true},
+			data: {"blogTitle": blogTitle},
 			success: function(data) {
 				if(data.title.toLowerCase() == "success"){
 					showAlert(

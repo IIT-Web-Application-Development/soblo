@@ -27,6 +27,39 @@ var Notifications = notifications.Notifications;
 var pw = functions.password(passwordHash);
 
 
+//======== FOR TESTING ONLY ========
+
+var allBlogs = [];
+var dummyBlogCounter = 1;
+
+function getBlogByID(blogID){
+	for(var i = 0; i < allBlogs.length; i++){
+		var thisBlog = allBlogs[i];
+
+		if(thisBlog.id == blogID){
+			return thisBlog;
+		}
+	}
+}
+function isUserAllowedToViewBlog(currentUserID, blogID){
+	var theBlog = getBlogByID(blogID);
+	var isUserAllowed = false;
+
+	for(var i = 0; i < theBlog.followersAllowed.length; i++){
+		var thisFollower = theBlog.followersAllowed[i];
+
+		if(thisFollower == currentUserID){
+			isUserAllowed = true;
+		}
+	}
+
+	return isUserAllowed;
+
+}
+
+//======== END TESTING ========
+
+
 /*********************************/
 /***** SERVER INITIALIZATION *****/
 /*********************************/
@@ -62,7 +95,7 @@ app.listen(app.get("port"), function() {
 	dummyUser.firstName = "Daniel";
 	dummyUser.lastName = "Rakaric";
 	dummyUser.preferences = {colorScheme:"theme-blue"};
-	dummyUser.followers = [];
+	dummyUser.followers = [2];
 	dummyUser.password = pw.generateDefault();
 
 	Users.addUser(dummyUser);
@@ -74,7 +107,7 @@ app.listen(app.get("port"), function() {
 	dummyUser1.firstName = "Oscar";
 	dummyUser1.lastName = "Ruiz";
 	dummyUser1.preferences = {colorScheme:"theme-blue"};
-	dummyUser1.followers = [];
+	dummyUser1.followers = [1];
 	dummyUser1.password = pw.generateDefault();
 
 	Users.addUser(dummyUser1);
@@ -86,7 +119,7 @@ app.listen(app.get("port"), function() {
 	dummyUser2.firstName = "Suryadevi";
 	dummyUser2.lastName = "Balarajan";
 	dummyUser2.preferences = {colorScheme:"theme-blue"};
-	dummyUser2.followers = [];
+	dummyUser2.followers = [2];
 	dummyUser2.password = pw.generateDefault();
 
 	Users.addUser(dummyUser2);
@@ -98,10 +131,67 @@ app.listen(app.get("port"), function() {
 	dummyUser3.firstName = "John";
 	dummyUser3.lastName = "Doe";
 	dummyUser3.preferences = {colorScheme:"theme-blue"};
-	dummyUser3.followers = [];
+	dummyUser3.followers = [3,4];
 	dummyUser3.password = pw.generateDefault();
 
 	Users.addUser(dummyUser3);
+
+
+	var dummyBlog = {
+		id: dummyBlogCounter++,
+		ownerId: 2,
+		userName: "oruiz",
+		blogTitle: "Test1",
+		followersAllowed: [1],
+		privacy: "public"
+	};
+
+	allBlogs.push(dummyBlog);
+
+	var dummyBlog1 = {
+		id: dummyBlogCounter++,
+		ownerId: 2,
+		userName: "oruiz",
+		blogTitle: "Test2",
+		followersAllowed: [1],
+		privacy: "private"
+	};
+
+	allBlogs.push(dummyBlog1);
+	
+	var dummyBlog2 = {
+		id: dummyBlogCounter++,
+		ownerId: 4,
+		userName: "jdoe",
+		blogTitle: "Test3",
+		followersAllowed: [3,4],
+		privacy: "private"
+	};
+
+	allBlogs.push(dummyBlog2);
+	
+	var dummyBlog3 = {
+		id: dummyBlogCounter++,
+		ownerId: 4,
+		userName: "jdoe",
+		blogTitle: "Test4",
+		followersAllowed: [3,4],
+		privacy: "public"
+	};
+
+	allBlogs.push(dummyBlog3);
+	
+	var dummyBlog4 = {
+		id: dummyBlogCounter++,
+		ownerId: 3,
+		userName: "sbalarajan",
+		blogTitle: "Test4",
+		followersAllowed: [2],
+		privacy: "private"
+	};
+
+	allBlogs.push(dummyBlog4);
+	
 });
 
 
@@ -143,14 +233,37 @@ app.get("/users/:userName", function(request, response) {
 	
 });
 
+app.get("/or/:userName/blog", function(request, response) {
+	var dummyBlog = {
+		id: dummyBlogCounter++,
+		ownerId: 2,
+		userName: "oruiz",
+		blogTitle: "Test1",
+		followersAllowed: [1],
+		privacy: "public"
+	};
+
+	allBlogs.push(dummyBlog);
+	
+});
+
 app.get("/or", function(request, response) {
 	var sess = request.session;
 	var user = sess.user;
+	var myBlogs = [];
 
 	if (sess.user === undefined) user = functions.User();
 	else user = sess.user;
 
-	response.render("or-all-users", {user, userList: Users.users, "colorSchemes": functions.ColorSchemes, notificationList : Notifications.notifications});
+	for(var i = 0; i < allBlogs.length; i++){
+		var thisBlog = allBlogs[i];
+		if(thisBlog.privacy.toLowerCase() == "public") myBlogs.push(thisBlog);
+
+		if(thisBlog.privacy.toLowerCase() == "private" && isUserAllowedToViewBlog(user.id, thisBlog.id)){
+			myBlogs.push(thisBlog);
+		} //
+	}
+	response.render("or-all-users", {user, userList: Users.users, "colorSchemes": functions.ColorSchemes, notificationList : Notifications.notifications, blogsList : allBlogs, myBlogsList: myBlogs});
 	
 });
 
@@ -302,6 +415,7 @@ app.post("/or/:userName/notifications", function(request, response){
 	//var sess = request.session;
 	//var currentUserId = sess.user.id;
 	var userName = request.params.userName;
+	var blogTitle = request.body.blogTitle;
 	var storedUser = Users.findByUserName(userName);
 	var allowedFollowers = [];
 
@@ -315,10 +429,12 @@ app.post("/or/:userName/notifications", function(request, response){
 		var newNotification = notifications.Notification();
 
 		newNotification.ownerId = storedUser.id;
-		newNotification.blogTitle = "Test1";
+		newNotification.blogTitle = blogTitle;
 		newNotification.userName = userName;
 		newNotification.followersAllowed = allowedFollowers;
+
 		Notifications.addNotification(newNotification);
+
 		response.status(200).send({ "error" : 0, "title" : "Success", "message" : "Successfully added notification.", notificationList : Notifications.notifications  });
 	}
 	else{
@@ -371,7 +487,7 @@ app.put("/or/:userName/follow", function(request, response){
 		response.status(200).send({ "error" : 0, "title" : "Success", "message" : "Successfully unsubscribed to user." });
 	}
 	else{
-		response.status(200).send({"error" : 0, "title" : "Warning", "message" : "Already unsubscribed to user." });
+		response.status(200).send({ "error" : 0, "title" : "Warning", "message" : "Already unsubscribed to user." });
 	}
 });
 
@@ -407,3 +523,5 @@ app.put("/or/:userName/notifications/:notificationId", function(request, respons
 	}
 });
 /*** PUT METHODS END ***/
+
+module.exports = app; // for testing

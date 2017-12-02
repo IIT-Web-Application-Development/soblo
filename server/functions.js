@@ -32,20 +32,20 @@ var Users = {
 		}
 	},
 	verifyFollower: function(user, followerId) {
-		console.log("Searching for follower ID: " + followerId);
+		//console.log("Searching for follower ID: " + followerId);
 		var isFound = false;
 
 		for (var i = 0; i < user.followers.length; i++) {
 			var thisFollower = user.followers[i];
 
-			console.log("Compare value: " + thisFollower);
+			//console.log("Compare value: " + thisFollower);
 			if (thisFollower == followerId) {
-				console.log("Follower with ID: " + thisFollower + " already exists.");
+				//console.log("Follower with ID: " + thisFollower + " already exists.");
 				isFound = true;
 			}
 		}
 
-		console.log("Is follower found? " + isFound);
+		//console.log("Is follower found? " + isFound);
 		return isFound;
 	},
 	nextUserId: function() {

@@ -21,6 +21,7 @@ html(lang="en")
 					include fragments/login
 				- else
 					p Logged In!
+
 					table(class='table table-striped table-dark table-hover')
 						thead
 							tr
@@ -40,6 +41,8 @@ html(lang="en")
 									a(class='badge badge-pill badge-primary' id='unfollow-user-link' name='unfollow-user-link' role='button' data-unfollow-user-name=username) Unsubscribe
 									a(class='badge badge-pill badge-primary' id='notification-link' name='notification-link' role='button' data-notification-user-name=username data-notification-title='Sample Title'+user.id) Add Notification
 									a(class='badge badge-pill badge-primary' id='create-blog-link' name='create-blog-link' role='button' data-create-blog-user-name=username) Add Blog
+									span Privacy: 
+										input(id='blog-privacy-setting-btn' data-toggle='toggle' data-on='Enabled' data-off='Disabled' data-onstyle='success' data-offstyle='danger' data-size='small' type='checkbox')
 
 					h3 Blog Entries I Can View
 					table(class='table table-striped table-dark table-hover')

@@ -90,6 +90,15 @@ function getNotifications(){
 		success: function(data) {
 			$("#my-notifications-list").html("");
 			var myNotifications = "";
+
+			if(data.notificationList.length > 0){
+				$('#notification-display-item').show();
+				$('#notification-total-display').html(data.notificationList.length);
+				$('#notification-total-display').css('background-color', '#dc3545');
+			}else{
+				$('#notification-display-item').hide();
+			}
+
 			$.each(data.notificationList, function(key, value){
 				//console.log(value.blogTitle);
 				$("#my-notifications-list").append(
@@ -116,6 +125,7 @@ function getNotifications(){
 }
 //On Page load
 $(document).ready(function(){
+	$('#notification-display-item').hide();
     getNotifications();
 });
 

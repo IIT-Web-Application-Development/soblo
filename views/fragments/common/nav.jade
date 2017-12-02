@@ -6,6 +6,10 @@ nav.navbar.navbar-default
 		ul(data-toggle="collapse" data-target=".nav-collapse").nav.navbar-nav
 		ul.nav.navbar-nav.navbar-right
 			- if (user != undefined && user.isAuth)
+				li(id='notification-display-item' name='notification-display-item')
+					a(href='/notifications') Notifications 
+						span(class='badge badge-danger' id='notification-total-display' name='notification-total-display') 0
+
 				li
 					a(href="#", data-toggle="dropdown").dropdown-toggle
 						span Welcome, #{user.firstName} #{user.lastName}

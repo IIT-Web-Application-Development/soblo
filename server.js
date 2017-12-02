@@ -261,9 +261,22 @@ app.get("/or", function(request, response) {
 
 		if(thisBlog.privacy.toLowerCase() == "private" && isUserAllowedToViewBlog(user.id, thisBlog.id)){
 			myBlogs.push(thisBlog);
-		} //
+		}
 	}
+
 	response.render("or-all-users", {user, userList: Users.users, "colorSchemes": functions.ColorSchemes, notificationList : Notifications.notifications, blogsList : allBlogs, myBlogsList: myBlogs});
+	
+});
+
+app.get("/notifications", function(request, response) {
+	var sess = request.session;
+	var user = sess.user;
+	var myBlogs = [];
+
+	if (sess.user === undefined) user = functions.User();
+	else user = sess.user;
+
+	response.render("or-all-notifications", {user, userList: Users.users, "colorSchemes": functions.ColorSchemes, notificationList : Notifications.notifications});
 	
 });
 

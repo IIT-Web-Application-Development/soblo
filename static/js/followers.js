@@ -80,3 +80,13 @@ $(document).on("click", "#unfollow-user-link", function(event){
 		});
 });
 
+$(document).on("change", "#blog-privacy-setting-btn", function(event){
+	//Stop form from submitting normally
+	if($(this).prop("checked") == true){
+	 	var text = $(this).attr('data-on');
+		console.log(text);
+	}else{
+	 	var text = $(this).attr('data-off');
+		console.log(text);
+	}
+});

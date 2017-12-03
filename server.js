@@ -209,7 +209,7 @@ app.get("/", function(request, response) {
 	if (sess.user === undefined) user = functions.User();
 	else user = sess.user;
 
-	response.render("main", {user, "colorSchemes": functions.ColorSchemes});
+	response.render("main", {user, "colorSchemes": functions.ColorSchemes, notificationList : Notifications.notifications,});
 });
 
 app.get("/sign-up", function(request, response) {

@@ -82,7 +82,7 @@ $(document).on("click", "#notification-mark-read-link", function(event){
 });
 
 function getNotifications(){
-	var userName = $('#my-notifications-list').attr('data-notification-user-name');
+	var userName = $('#notification-display-item').attr('data-notification-user-name');
 	$.ajax({
 		method: "GET",
 		url: mainServerPath + userName + "/notifications",

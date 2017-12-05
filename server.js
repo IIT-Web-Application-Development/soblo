@@ -14,17 +14,16 @@ var app = express();
 var jade = require('jade');
 var request = require('request');
 var passwordHash = require('password-hash');
-/*var nodemailer = require('nodemailer');
-var smtpTransport = require('nodemailer-smtp-transport');
-*/
+
 // Local
 var functions = require('./server/functions');
 var notifications = require('./server/notifications');
-//var User = functions.User;
 var Users = functions.Users;
 var Notifications = notifications.Notifications;
-//var Preferences = functions.Preferences;
 var pw = functions.password(passwordHash);
+var log = function(msg) {
+	functions.log(msg);
+}
 
 var blogs = require('./server/blogPosts');
 var BlogPosts = blogs.BlogPosts;
@@ -69,7 +68,9 @@ function isUserAllowedToViewBlog(currentUserID, blogID){
 app.set("port", (process.env.PORT || 5000));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(express.static(__dirname + "/static"));
+app.use(express.static(__dirname + "/static")); // Use local css/js as linkable page
+
+// Create a session cookie.
 //app.set('trust proxy', 1) // Secure site only.
 app.use(session({
 	/*genid: function(req) {
@@ -88,7 +89,7 @@ app.use(session({
 app.set("view engine","jade");
 
 app.listen(app.get("port"), function() {
-	console.log("Node app is running on port", app.get("port"));
+	log("Node app is running on port", app.get("port"));
 
 	var dummyUser = functions.User();
 
@@ -210,6 +211,7 @@ app.listen(app.get("port"), function() {
 
 /*** GET METHODS START ***/
 
+// Root page. Sends common objects as options
 app.get("/", function(request, response) {
 	var sess = request.session;
 	var user = sess.user;
@@ -222,10 +224,12 @@ app.get("/", function(request, response) {
 	response.render("blog", {user, "colorSchemes": functions.ColorSchemes, notificationList : Notifications.notifications, blogentries});
 });
 
+// Render the sign-up page
 app.get("/sign-up", function(request, response) {
 	response.render("sign-up");
 });
 
+// Logout function (Redirect)
 app.get("/logout", function(request, response) {
 	var sess = request.session;
 	sess.destroy();
@@ -233,14 +237,14 @@ app.get("/logout", function(request, response) {
 	response.redirect("/");
 });
 
+// Return a user object by a username (Ajaxable)
 app.get("/users/:userName", function(request, response) {
 	response.set('Content-Type', 'application/json');
 	var userName = request.params.userName;
 
 	var searchedUser = Users.findByUserName(userName);
 	if (searchedUser !== undefined) response.status(200).send({"user":searchedUser});
-	else response.status(200).send({"error":"User not found"});
-	
+	else response.status(200).send({"error":"User not found"});	
 });
 
 //Placeholder route to retrieve simulated blog posts
@@ -369,7 +373,7 @@ app.get("/or/:userName/notifications/:notificationId", function(request, respons
 /*** POST METHODS START ***/
 
 app.post("/", function(request, response) {
-	console.log("request : " + request.body.blogEntry);
+	log("request : " + request.body.blogEntry);
 	var blogPost = request.body.blogEntry;
 
 	var sess = request.session;
@@ -387,25 +391,26 @@ app.post("/", function(request, response) {
 	BlogPosts.addEntry(blog);
 
 	var blogentries = BlogPosts.getAllEntries();
-	console.log("res : " + blogentries);
+	log("res : " + blogentries);
 	for( var i = 0; i < blogentries.length; i++){
-		console.log(blogentries[i]);
+		log(blogentries[i]);
 	}
 	
 	response.render("blog", {user, "colorSchemes": functions.ColorSchemes, notificationList : Notifications.notifications, blogentries});
 
 });
 
+// Post login credentials (Ajaxable)
 app.post("/login", function(request, response) {
-	console.log(request.body);
+	log(request.body);
 	var userName = request.body.userName;
 	var password = request.body.password;
 
-	console.log("Submitted Credentials: " + userName + "::" + password);
+	log("Submitted Credentials: " + userName + "::" + password);
 
 	var user = Users.findByUserName(userName);
 	user.isAuth = pw.verify(password, user.password);
-	console.log("Authenticated? " + user.isAuth);
+	log("Authenticated? " + user.isAuth);
 
 	if (user.isAuth) {
 		var sess = request.session;
@@ -413,10 +418,9 @@ app.post("/login", function(request, response) {
 		response.status(200).send(true);
 	} else
 		response.status(401).send(false);
-
-	//response.redirect("/");
 });
 
+// Simple post for sign-up (Redirect)
 app.post("/sign-up", function(request, response) {
 	var newUser = functions.User();
 
@@ -431,13 +435,22 @@ app.post("/sign-up", function(request, response) {
 	response.redirect("/");
 });
 
+// Simple post for updating a user's theme (Redirect)
 app.post("/update-theme", function(request, response) {
 	var colorScheme = request.body.colorScheme;
 	var sess = request.session;
 
-	var storedUser = Users.findByUserName(sess.user.userName);
-	storedUser.preferences.colorScheme = colorScheme;
-	sess.user = storedUser;
+	log("Submitted color scheme: " + colorScheme);
+	for (var i = 0; i < functions.ColorSchemes.schemes.length; i++) {
+
+		if (functions.ColorSchemes.schemes[i] == colorScheme) {
+			log("Color scheme, '" + colorScheme + "', is valid.");
+
+			var storedUser = Users.findByUserName(sess.user.userName);
+			storedUser.preferences.colorScheme = colorScheme;
+			sess.user = storedUser;
+		}
+	}
 
 	response.redirect("/");
 });
@@ -505,14 +518,6 @@ app.post("/or/:userName/notifications", function(request, response){
 	}
 });
 /*** POST METHODS END ***/
-
-
-/*** DELETE METHODS START ***/
-
-app.delete("/users/:userId", function(request, response) {
-});
-
-/*** DELETE METHODS END ***/
 
 
 /*** PUT METHODS START ***/

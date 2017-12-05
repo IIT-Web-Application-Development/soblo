@@ -20,8 +20,6 @@
     "express": "4.15.2",
     "express-session": "^1.15.6",
     "jade": "^1.11.0",
-    "nodemailer": "^4.4.0",
-    "nodemailer-smtp-transport": "^2.7.4",
     "password-hash": "^1.2.2",
     "request": "^2.83.0"
   },

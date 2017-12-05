@@ -1,4 +1,10 @@
 var pwHash;
+var isDebug = false;
+
+function log(msg) {
+	if (isDebug)
+		console.log(msg);
+}
 
 var Users = {
 	users: [], // In-memory users.
@@ -8,11 +14,11 @@ var Users = {
 			if (user instanceof User && user.uniqueConstraint != "") {
 				// Set the next available ID for the user.
 				user.id = Users.nextUserId();
-				console.log("Set user ID: " + user.id);
+				log("Set user ID: " + user.id);
 
 				// Persist the user.
 				this.users.push(user);
-				console.log("Added user: " + JSON.stringify(user));
+				log("Added user: " + JSON.stringify(user));
 			} else
 				throw "Not a user object!";
 		} catch (err) {
@@ -20,32 +26,32 @@ var Users = {
 		}
 	},
 	findByUserName: function(userName) {
-		console.log("Searching for user: " + userName);
+		log("Searching for user: " + userName);
 
 		for (var i = 0; i < this.users.length; i++) {
 			var thisUser = this.users[i];
 
 			if (thisUser.userName == userName) {
-				console.log("Found user: " + JSON.stringify(thisUser));
+				log("Found user: " + JSON.stringify(thisUser));
 				return thisUser;
 			}
 		}
 	},
 	verifyFollower: function(user, followerId) {
-		//console.log("Searching for follower ID: " + followerId);
+		log("Searching for follower ID: " + followerId);
 		var isFound = false;
 
 		for (var i = 0; i < user.followers.length; i++) {
 			var thisFollower = user.followers[i];
 
-			//console.log("Compare value: " + thisFollower);
+			log("Compare value: " + thisFollower);
 			if (thisFollower == followerId) {
-				//console.log("Follower with ID: " + thisFollower + " already exists.");
+				log("Follower with ID: " + thisFollower + " already exists.");
 				isFound = true;
 			}
 		}
 
-		//console.log("Is follower found? " + isFound);
+		log("Is follower found? " + isFound);
 		return isFound;
 	},
 	nextUserId: function() {
@@ -115,7 +121,7 @@ var ColorSchemes = {
 }
 
 function postDummyData(URL, body) {
-	console.log("Post Dummy Data: ", URL, " -> ", body);
+	log("Post Dummy Data: ", URL, " -> ", body);
 
     var options = {
 	  method: "POST",
@@ -126,10 +132,10 @@ function postDummyData(URL, body) {
 
 	request(options, function (err, res, body) {
 	  if (err) {
-	    console.log("Error: ", err);
+	    log("Error: ", err);
 	    return;
 	  }
-	  console.log("Body Result:", body);
+	  log("Body Result:", body);
 	});
 }
 
@@ -151,5 +157,8 @@ module.exports = {
 	password: function(passwordHash) {
 		pwHash = passwordHash;
 		return Password;
+	},
+	log: function(msg) {
+		log(msg);
 	}
 }

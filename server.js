@@ -26,6 +26,8 @@ var Notifications = notifications.Notifications;
 //var Preferences = functions.Preferences;
 var pw = functions.password(passwordHash);
 
+var blogs = require('./server/blogPosts');
+var BlogPosts = blogs.BlogPosts;
 
 //======== FOR TESTING ONLY ========
 
@@ -214,8 +216,10 @@ app.get("/", function(request, response) {
 
 	if (sess.user === undefined) user = functions.User();
 	else user = sess.user;
+	
+	var blogentries = BlogPosts.getAllEntries();
 
-	response.render("main", {user, "colorSchemes": functions.ColorSchemes, notificationList : Notifications.notifications,});
+	response.render("blog", {user, "colorSchemes": functions.ColorSchemes, notificationList : Notifications.notifications, blogentries});
 });
 
 app.get("/sign-up", function(request, response) {
@@ -363,6 +367,34 @@ app.get("/or/:userName/notifications/:notificationId", function(request, respons
 
 
 /*** POST METHODS START ***/
+
+app.post("/", function(request, response) {
+	console.log("request : " + request.body.blogEntry);
+	var blogPost = request.body.blogEntry;
+
+	var sess = request.session;
+	var user = sess.user;
+
+	if (sess.user === undefined) user = functions.User();
+	else user = sess.user;
+	
+	var blog = blogs.BlogPost();
+	blog.id = BlogPosts.nextBlogId();
+	blog.post = request.body.blogEntry;
+	blog.title = request.body.title;
+	blog.userid = user.userName;
+
+	BlogPosts.addEntry(blog);
+
+	var blogentries = BlogPosts.getAllEntries();
+	console.log("res : " + blogentries);
+	for( var i = 0; i < blogentries.length; i++){
+		console.log(blogentries[i]);
+	}
+	
+	response.render("blog", {user, "colorSchemes": functions.ColorSchemes, notificationList : Notifications.notifications, blogentries});
+
+});
 
 app.post("/login", function(request, response) {
 	console.log(request.body);

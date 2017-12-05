@@ -1,0 +1,39 @@
+doctype html
+html(lang="en")
+	head
+		include fragments/common/head
+	body(class="#{user.preferences.colorScheme}")
+		// Alert Modal
+		div#alertModal.alert.modal.fade(role="dialog")
+			div.modal-dialog
+				div.modal-content
+					div.modal-header
+						button(type="button", data-dismiss="modal").close &times;
+						h4.modal-title
+					div.modal-body
+
+		// Top navigation bar
+		include fragments/common/nav
+
+		div.container
+			div.content
+				- if (!user.isAuth)
+					include fragments/login
+				- else
+					p Logged In!
+					div.form-group
+						form(id='blog-entry-post' name='blog-entry-post' method='post')
+							textarea#text.form-control(rows="1", name="title", placeholder="Title")
+							p
+							textarea#text.form-control(rows="5", name="text", placeholder="Type here")
+							p
+									
+							button.btn.btn-primary(id='submit-btn' type="submit") Submit
+					if (blogentries.length > 0 )
+						each blog in blogentries
+							if(blog.title && blog.post)
+								.panel.panel-default
+									.panel-heading #{blog.title}
+									.panel-body #{blog.post}
+					- else 
+						p No Blog Entries for this User yet

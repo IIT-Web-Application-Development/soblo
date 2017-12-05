@@ -29,16 +29,6 @@ describe('Notifications', () => {
 			});
 	});
 
-/*
-    afterEach((withDummyData) => { //Add dummy data before specific tests
-			chai.request(server)
-				.delete('/users/0')
-				.end((err, res) => {
-					res.should.have.status(204);
-					withDummyData();
-				});
-	});
-*/
 	/*
 	* Test the /GET route
 	*/
@@ -269,11 +259,9 @@ describe('Subscribers/Followers', () => {
 	*/
 	describe('/POST Followers', () => {
 		it('it should POST a new follower for the given user - Successfully subscribe as follower to a user', (withDummyData) => {
-			//let blogTitle = { blogTitle : "My Notification" }
 		
 			chai.request(server)
 				.post(mainServerPath +'jdoe/follow')
-				//.send(blogTitle)
 				.end((err, res) => {
 					res.should.have.status(200);
 					res.body.should.be.a('object');
@@ -290,11 +278,9 @@ describe('Subscribers/Followers', () => {
 	*/
 	describe('/POST Followers', () => {
 		it('it should NOT POST a new follower for the given user - Already subscribed/following this user', (withDummyData) => {
-			//let blogTitle = { blogTitle : "My Notification" }
 		
 			chai.request(server)
 				.post(mainServerPath +'jdoe/follow')
-				//.send(blogTitle)
 				.end((err, res) => {
 					res.should.have.status(200);
 					res.body.should.be.a('object');
@@ -311,11 +297,9 @@ describe('Subscribers/Followers', () => {
 	*/
 	describe('/POST Followers', () => {
 		it('it should NOT POST a new follower for the given user - User does NOT exist', (withDummyData) => {
-			//let blogTitle = { blogTitle : "My Notification" }
 		
 			chai.request(server)
 				.post(mainServerPath +'fakeUser/follow')
-				//.send(blogTitle)
 				.end((err, res) => {
 					res.should.have.status(404);
 					res.body.should.be.a('object');
@@ -332,11 +316,9 @@ describe('Subscribers/Followers', () => {
 	*/
 	describe('/PUT Followers', () => {
 		it('it should UPDATE the list of followers for the given user - Successfully unsubscribe as follower to a user', (withDummyData) => {
-			//let blogTitle = { blogTitle : "My Notification" }
 		
 			chai.request(server)
 				.put(mainServerPath +'jdoe/follow')
-				//.send(blogTitle)
 				.end((err, res) => {
 					res.should.have.status(200);
 					res.body.should.be.a('object');
@@ -353,11 +335,9 @@ describe('Subscribers/Followers', () => {
 	*/
 	describe('/PUT Followers', () => {
 		it('it should NOT UPDATE the list of followers for the given user - Already unsubscribed as follower to a user', (withDummyData) => {
-			//let blogTitle = { blogTitle : "My Notification" }
 		
 			chai.request(server)
 				.put(mainServerPath +'jdoe/follow')
-				//.send(blogTitle)
 				.end((err, res) => {
 					res.should.have.status(200);
 					res.body.should.be.a('object');
@@ -375,11 +355,9 @@ describe('Subscribers/Followers', () => {
 	*/
 	describe('/PUT Followers', () => {
 		it('it should NOT UPDATE the list of followers for the given user - User does NOT exist', (withDummyData) => {
-			//let blogTitle = { blogTitle : "My Notification" }
 		
 			chai.request(server)
 				.put(mainServerPath +'fakeUser/follow')
-				//.send(blogTitle)
 				.end((err, res) => {
 					res.should.have.status(404);
 					res.body.should.be.a('object');

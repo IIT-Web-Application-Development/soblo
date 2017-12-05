@@ -1,3 +1,7 @@
+/*
+	Code used to simulate subscribing/following a user
+*/
+
 var mainServerPath = "/or/"; //"/users/";
 $(document).on("click", "#follow-user-link", function(event){
 		//Stop form from submitting normally
@@ -9,6 +13,7 @@ $(document).on("click", "#follow-user-link", function(event){
 			url: mainServerPath + userName + "/follow",
 			data: {"userName": userName},
 			success: function(data) {
+				//Show alert based on title
 				if(data.title.toLowerCase() == "success"){
 					showAlert(
 						data.title,
@@ -39,6 +44,10 @@ $(document).on("click", "#follow-user-link", function(event){
 		});
 });
 
+/*
+	Code used to simulate unsubscribing/unfollowing a user
+*/
+
 $(document).on("click", "#unfollow-user-link", function(event){
 		//Stop form from submitting normally
         event.preventDefault();
@@ -49,7 +58,7 @@ $(document).on("click", "#unfollow-user-link", function(event){
 			url: mainServerPath + userName + "/follow",
 			data: {"userName": userName},
 			success: function(data) {
-				//console.log(data.title.toLowerCase());
+				//Show alert based on title
 				if(data.title.toLowerCase() == "success"){
 					showAlert(
 						data.title,
@@ -79,6 +88,11 @@ $(document).on("click", "#unfollow-user-link", function(event){
 			}
 		});
 });
+
+/*
+	Code used to simulate retrieving the privacy setting value from
+	the switch togglers
+*/
 
 $(document).on("change", "#blog-privacy-setting-btn", function(event){
 	//Stop form from submitting normally

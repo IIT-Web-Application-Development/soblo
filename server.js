@@ -137,6 +137,10 @@ app.listen(app.get("port"), function() {
 	Users.addUser(dummyUser3);
 
 
+//======== FOR TESTING ONLY ========
+
+//Simulated blog entries to test blog privacy settings
+
 	var dummyBlog = {
 		id: dummyBlogCounter++,
 		ownerId: 2,
@@ -192,6 +196,8 @@ app.listen(app.get("port"), function() {
 
 	allBlogs.push(dummyBlog4);
 	
+//======== FOR TESTING ONLY ========
+
 });
 
 
@@ -233,6 +239,7 @@ app.get("/users/:userName", function(request, response) {
 	
 });
 
+//Placeholder route to retrieve simulated blog posts
 app.get("/or/:userName/blog", function(request, response) {
 	var dummyBlog = {
 		id: dummyBlogCounter++,
@@ -247,6 +254,12 @@ app.get("/or/:userName/blog", function(request, response) {
 	
 });
 
+/*
+	Placeholder route used to test simulated features:
+		1) Subscribe/unsubscribe
+		2) Notifications
+		3) Blog post privacy settings
+*/
 app.get("/or", function(request, response) {
 	var sess = request.session;
 	var user = sess.user;
@@ -268,6 +281,7 @@ app.get("/or", function(request, response) {
 	
 });
 
+//Placeholder route used to retrieve all notifications
 app.get("/notifications", function(request, response) {
 	var sess = request.session;
 	var user = sess.user;
@@ -280,6 +294,7 @@ app.get("/notifications", function(request, response) {
 	
 });
 
+//Placeholder route used to retrieve notification based on the username
 app.get("/or/:userName/notifications", function(request, response){
 	//Set content type header
 	response.set('Content-Type', 'application/json');
@@ -311,6 +326,8 @@ app.get("/or/:userName/notifications", function(request, response){
 	}
 });
 
+//Placeholder route used to retrieve a specific notification based on the notification ID
+//for a particular username
 app.get("/or/:userName/notifications/:notificationId", function(request, response){
 	//Set content type header
 	response.set('Content-Type', 'application/json');
@@ -393,6 +410,7 @@ app.post("/update-theme", function(request, response) {
 	response.redirect("/");
 });
 
+//Placeholder route used to simulate adding a follower/subscriber to a user
 app.post("/or/:userName/follow", function(request, response){
 	//Set content type header
 	response.set('Content-Type', 'application/json');
@@ -421,7 +439,7 @@ app.post("/or/:userName/follow", function(request, response){
 	}
 });
 
-//NOTE: CHANGE TO POST
+//Placeholder route used to simulate adding a new notification to a particular user
 app.post("/or/:userName/notifications", function(request, response){
 	//Set content type header
 	response.set('Content-Type', 'application/json');
@@ -467,6 +485,8 @@ app.delete("/users/:userId", function(request, response) {
 
 /*** PUT METHODS START ***/
 
+//Placeholder route used to simulate updating the list of followers
+//for a particular user
 app.put("/or/:userName/follow", function(request, response){
 	//Set content type header
 	response.set('Content-Type', 'application/json');
@@ -504,6 +524,8 @@ app.put("/or/:userName/follow", function(request, response){
 	}
 });
 
+//Placeholder route used to simulate updating marking a 
+//notification as "read" by a user
 app.put("/or/:userName/notifications/:notificationId", function(request, response){
 	//Set content type header
 	response.set('Content-Type', 'application/json');

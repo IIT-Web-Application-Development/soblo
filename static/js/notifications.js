@@ -1,3 +1,7 @@
+/*
+	Code used to simulate adding a blog post alert/notification
+*/
+
 var mainServerPath = "/or/"; //"/users/";
 $(document).on("click", "#notification-link", function(event){
 		//Stop form from submitting normally
@@ -10,6 +14,7 @@ $(document).on("click", "#notification-link", function(event){
 			url: mainServerPath + userName + "/notifications",
 			data: {"blogTitle": blogTitle},
 			success: function(data) {
+				//Show alert based on title
 				if(data.title.toLowerCase() == "success"){
 					showAlert(
 						data.title,
@@ -39,6 +44,10 @@ $(document).on("click", "#notification-link", function(event){
 			}
 		});
 });
+
+/*
+	Code used to simulate marking a notification as "read"
+*/
 
 $(document).on("click", "#notification-mark-read-link", function(event){
 		//Stop form from submitting normally
@@ -51,6 +60,7 @@ $(document).on("click", "#notification-mark-read-link", function(event){
 			url: mainServerPath + userName + "/notifications/" + notificationID,
 			data: {"trigger": true},
 			success: function(data) {
+				//Show alert based on title
 				if(data.title.toLowerCase() == "success"){
 					showAlert(
 						data.title,
@@ -81,6 +91,11 @@ $(document).on("click", "#notification-mark-read-link", function(event){
 		});
 });
 
+/*
+	Code used to simulate retrieving all the notifications
+	for the logged in user
+*/
+
 function getNotifications(){
 	var userName = $('#notification-display-item').attr('data-notification-user-name');
 	$.ajax({
@@ -91,6 +106,7 @@ function getNotifications(){
 			$("#my-notifications-list").html("");
 			var myNotifications = "";
 
+			//Display button if there are notifications for this user
 			if(data.notificationList.length > 0){
 				$('#notification-display-item').show();
 				$('#notification-total-display').html(data.notificationList.length);
@@ -99,6 +115,7 @@ function getNotifications(){
 				$('#notification-display-item').hide();
 			}
 
+			//Loop through the list of notifications and append to table
 			$.each(data.notificationList, function(key, value){
 				//console.log(value.blogTitle);
 				$("#my-notifications-list").append(
@@ -125,6 +142,7 @@ function getNotifications(){
 }
 //On Page load
 $(document).ready(function(){
+	//Retrieve notifications
 	$('#notification-display-item').hide();
     getNotifications();
 });

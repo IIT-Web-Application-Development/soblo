@@ -1,5 +1,5 @@
 var Notifications = {
-	notifications: [], // In-memory users.
+	notifications: [], // In-memory notifications.
 	addNotification: function(notification) {
 		try {
 			// Check if the passed object is a User.
@@ -88,7 +88,7 @@ function Notification() {
 	this.ownerId = "";
 	this.blogTitle = "";
 	this.userName = "";
-	this.followersAllowed = [];
+	this.followersAllowed = []; //List of user IDs who can view this notification
 	this.uniqueConstraint = function() {
 		return this.id;
 	}
